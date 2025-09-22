@@ -1,0 +1,27 @@
+apt-get update && apt-get upgrade -y
+apt-get install net-tools privoxy dante-server -y
+sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh) -n
+groupadd nordvpn
+usermod -aG nordvpn $USER
+nordvpn whitelist add port 8118
+nordvpn whitelist add port 1080
+nordvpn set analytics 0
+nordvpn login --token e9f2abde3679b80723689cade6e9b8171c70b32c0ab7322d17df71281972ea9a 
+nordvpn connect Canada
+
+#configure privoxy
+systemctl stop privoxy
+sudo sed -i -e 's/^#*\s*listen-address\s*127.0.0.1:8118/listen-address :8118/g' -e 's/^#*\s*listen-address\s*\[::1\]:8118/#listen-address [::1]:8118/g' /etc/privoxy/config
+systemctl start privoxy
+
+#configure danted
+sudo sed -i -e 's/^#internal: .*$/internal: 0.0.0.0 port = 1080/' -e 's/^#external: .*$/external: nordlynx/' -e 's/^#socksmethod: pam/socksmethod: none/' -e 's/^#*clientmethod: none/clientmethod: none/' /etc/danted.conf
+
+echo '
+client pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+}
+socks pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+}
+' | sudo tee -a /etc/danted.conf >/dev/null
