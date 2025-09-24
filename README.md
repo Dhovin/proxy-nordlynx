@@ -69,6 +69,17 @@ docker run -d \
 *   `NORDVPN_TECHNOLOGY`: The VPN technology to use (e.g., `nordlynx`).
 *   `LAN_NETWORK`: Your local area network CIDR (e.g., `192.168.10.0/24`). This is used for internal routing within the container.
 
+## Unraid Setup
+
+For Unraid users, you can use the standard Docker run command above as a template for your container setup. Here are some specific settings to apply in the Unraid Docker template:
+
+1.  **Network Type**: Set to `Bridge`.
+2.  **Privileged**: Turn this **on**.
+3.  **Post Arguments**: Add the following to the post arguments:
+    ```
+    --cap-add=NET_ADMIN
+    ```
+
 ## Usage
 
 Once the container is running, you can configure your applications to use the proxies:
